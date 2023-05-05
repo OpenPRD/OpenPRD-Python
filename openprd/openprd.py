@@ -8,10 +8,7 @@ class OpenPRDFile:
     def __init__(self, file_in, file_out=None):
         self.file_in = Path(file_in)
         self.file_out = Path(file_out) if file_out else None
-        self.PRDfile = self._open_file()
-        self.resources = self._parse_resources()
-        self.prd_data = self._retrieve_microdata()
-        self.prd_json = self.prd_data.json()
+        self.PRDfile = self._open_file()   
         
     def _open_file(self, read_obj=None):
         if read_obj:
@@ -27,6 +24,16 @@ class OpenPRDFile:
                 return zip_f
         except FileNotFoundError as err:
             print(err)
+
+
+class ReadPRD(OpenPRDFile):
+    """Reads data tags from main document and the creating a JSON object as
+       prd_json also contains method write_json to write to a file."""
+    def __init__(self, file_in, file_out=None):
+        super().__init__(file_in, file_out)
+        self.resources = self._parse_resources()
+        self.prd_data = self._retrieve_microdata()
+        self.prd_json = self.prd_data.json()
 
     def _parse_resources(self, prdfile=None):
         if not prdfile: prdfile = self.PRDfile
@@ -46,9 +53,8 @@ class OpenPRDFile:
                 return resource
             
         resources = {x:grab_res(y) for (x,y) in types.items()} 
-
         return resources
-
+    
     def _retrieve_microdata(self):
         pull_main_doc = self._open_file(read_obj=self.resources['doc_main'])
         return microdata.get_items(pull_main_doc)[0]
@@ -72,4 +78,7 @@ class OpenPRDFile:
             print(f"Successfully wrote resume data to {f_path}")
 
 
-# class CreatePRD()
+class BuildPRD(OpenPRDFile):
+    """This class provides methods to validate and package a prd file"""
+    def __init(self, file_in, file_out):
+        super().__init__(file_in, file_out)

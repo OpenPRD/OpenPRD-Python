@@ -1,4 +1,4 @@
-from openprd import OpenPRDFile
+from openprd import ReadPRD
 import argparse
 
 arg_parser = argparse.ArgumentParser(
@@ -20,9 +20,11 @@ arg_parser.add_argument('input_file')
 
 
 def main(args):
-    prd = OpenPRDFile(args.input_file)
+    prd = ReadPRD(args.input_file)
     if args.outputfile:
         prd.write_json(args.outputfile)
+    else:
+        print(prd.prd_json)
 
 if __name__ == "__main__":
     main(arg_parser.parse_args())
