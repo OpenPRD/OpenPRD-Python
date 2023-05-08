@@ -1,7 +1,8 @@
 import os
-import microdata
+import json
 from pathlib import Path
 from zipfile import ZipFile
+from extruct.w3cmicrodata import MicrodataExtractor
 
 
 class OpenPRDFile:
@@ -33,7 +34,7 @@ class ReadPRD(OpenPRDFile):
         super().__init__(file_in, file_out)
         self.resources = self._parse_resources()
         self.prd_data = self._retrieve_microdata()
-        self.prd_json = self.prd_data.json()
+        self.prd_json = json.dumps(self.prd_data[0])
 
     def _parse_resources(self, prdfile=None):
         if not prdfile: prdfile = self.PRDfile
@@ -57,7 +58,9 @@ class ReadPRD(OpenPRDFile):
     
     def _retrieve_microdata(self):
         pull_main_doc = self._open_file(read_obj=self.resources['doc_main'])
-        return microdata.get_items(pull_main_doc)[0]
+        mde = MicrodataExtractor()
+        return mde.extract(pull_main_doc)
+        # return microdata.get_items(pull_main_doc)[0]
 
     def write_json(self, file_loc=None):
         if file_loc:
